@@ -9,6 +9,8 @@ public class QuantityMeasurementApp {
 		
 		System.out.println("Equals: " + f1.equals(f2));
 		
+		Inches.demonstrateInchesEquality();
+		
 	}
 
 }
