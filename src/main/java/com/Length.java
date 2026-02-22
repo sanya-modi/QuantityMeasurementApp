@@ -2,19 +2,20 @@ package com;
 
 import java.util.Objects;
 
-public class Length {
+public final class Length {
 
     private final double value;
     private final LengthUnit unit;
 
-    // Base Unit = INCHES
+    private static final double EPSILON = 1e-6;
+
     public enum LengthUnit {
         FEET(12.0),
         INCHES(1.0),
         YARDS(36.0),
-        CENTIMETERS(0.393701);
+        CENTIMETERS(1.0 / 2.54);
 
-        private final double conversionFactor; // relative to inches
+        private final double conversionFactor;
 
         LengthUnit(double conversionFactor) {
             this.conversionFactor = conversionFactor;
@@ -25,73 +26,57 @@ public class Length {
         }
     }
 
-    //CONSTRUCTOR 
     public Length(double value, LengthUnit unit) {
+        if (!Double.isFinite(value))
+            throw new IllegalArgumentException("Invalid value");
 
-        if (!Double.isFinite(value)) {
-            throw new IllegalArgumentException("Invalid numeric value");
-        }
-
-        if (unit == null) {
+        if (unit == null)
             throw new IllegalArgumentException("Unit cannot be null");
-        }
 
         this.value = value;
         this.unit = unit;
     }
 
-    // PRIVATE BASE CONVERSION 
-    private double convertToBaseUnit() {
-        return this.value * this.unit.getConversionFactor();
+    public double getValue() {
+        return value;
     }
 
-    // Instance conversion method
+    public LengthUnit getUnit() {
+        return unit;
+    }
+
+    double convertToBaseUnit() {
+        return value * unit.getConversionFactor();
+    }
+
     public Length convertTo(LengthUnit targetUnit) {
-
-        if (targetUnit == null) {
-            throw new IllegalArgumentException("Target unit cannot be null");
-        }
-
-        // Step 1: Convert to base (inches)
-        double baseValue = convertToBaseUnit();
-
-        // Step 2: Convert base → target
-        double convertedValue = baseValue / targetUnit.getConversionFactor();
-
-        // Optional rounding (2 decimal places)
-        convertedValue = Math.round(convertedValue * 100.0) / 100.0;
-
-        return new Length(convertedValue, targetUnit);
+        double base = convertToBaseUnit();
+        double converted = base / targetUnit.getConversionFactor();
+        return new Length(converted, targetUnit);
     }
 
-    //EQUALITY 
     private boolean compare(Length that) {
+        double thisBase = this.convertToBaseUnit();
+        double thatBase = that.convertToBaseUnit();
 
-        double thisBase =
-                Math.round(this.convertToBaseUnit() * 100.0) / 100.0;
-
-        double thatBase =
-                Math.round(that.convertToBaseUnit() * 100.0) / 100.0;
-
-        return Double.compare(thisBase, thatBase) == 0;
+        return Math.abs(thisBase - thatBase) <= EPSILON;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Length)) return false;
-
-        Length that = (Length) o;
-        return compare(that);
+        return compare((Length) o);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(convertToBaseUnit());
+        long normalized = Math.round(convertToBaseUnit() / EPSILON);
+        return Long.hashCode(normalized);
     }
 
     @Override
     public String toString() {
-        return String.format("%.2f %s", value, unit);
+        return String.format("%.6f %s", value, unit);
     }
 }
