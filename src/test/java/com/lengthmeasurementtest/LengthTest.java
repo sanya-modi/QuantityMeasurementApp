@@ -1,6 +1,10 @@
-package com;
+package com.lengthmeasurementtest;
 
 import org.junit.jupiter.api.Test;
+
+import com.lengthmeasurement.Length;
+import com.lengthmeasurement.LengthUnit;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class LengthTest {

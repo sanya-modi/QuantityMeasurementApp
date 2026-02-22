@@ -1,4 +1,4 @@
-package com;
+package com.lengthmeasurement;
 
 import java.util.Objects;
 

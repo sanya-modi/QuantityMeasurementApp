@@ -1,4 +1,4 @@
-package com;
+package com.lengthmeasurement;
 
 public final class QuantityMeasurementApp {
 
