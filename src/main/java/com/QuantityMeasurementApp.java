@@ -1,55 +1,87 @@
 package com;
 
-public class QuantityMeasurementApp {
+public final class QuantityMeasurementApp {
 
-    // Equality API 
-    public static boolean demonstrateLengthEquality(Length l1, Length l2) {
+    private QuantityMeasurementApp() {
+        // prevent instantiation
+    }
+
+    //  EQUALITY 
+
+    public static boolean demonstrateLengthEquality(
+            Length l1,
+            Length l2) {
+
+        if (l1 == null || l2 == null)
+            throw new IllegalArgumentException("Lengths cannot be null");
+
         return l1.equals(l2);
     }
 
-    public static boolean demonstrateLengthComparison(
-            double value1, Length.LengthUnit unit1,
-            double value2, Length.LengthUnit unit2) {
+    // CONVERSION 
 
-        Length l1 = new Length(value1, unit1);
-        Length l2 = new Length(value2, unit2);
-
-        return demonstrateLengthEquality(l1, l2);
-    }
-
-    // UC5 NEW STATIC CONVERSION API 
     public static Length demonstrateLengthConversion(
             double value,
             Length.LengthUnit fromUnit,
             Length.LengthUnit toUnit) {
 
-        Length length = new Length(value, fromUnit);
-        return length.convertTo(toUnit);
+        return new Length(value, fromUnit)
+                .convertTo(toUnit);
     }
 
-    // Overloaded version
     public static Length demonstrateLengthConversion(
             Length length,
             Length.LengthUnit toUnit) {
 
+        if (length == null)
+            throw new IllegalArgumentException("Length cannot be null");
+
         return length.convertTo(toUnit);
     }
 
-    // Standalone testing
+    // ADDITION 
+    public static Length demonstrateLengthAddition(
+            Length l1,
+            Length l2) {
+
+        return LengthAddition.add(l1, l2);
+    }
+
+    // Overloaded version (raw values)
+
+    public static Length demonstrateLengthAddition(
+            double value1,
+            Length.LengthUnit unit1,
+            double value2,
+            Length.LengthUnit unit2) {
+
+        Length l1 = new Length(value1, unit1);
+        Length l2 = new Length(value2, unit2);
+
+        return LengthAddition.add(l1, l2);
+    }
+
+
     public static void main(String[] args) {
 
-        Length result1 =
-                demonstrateLengthConversion(1.0,
-                        Length.LengthUnit.FEET,
+        Length l1 = new Length(1.0, Length.LengthUnit.FEET);
+        Length l2 = new Length(12.0, Length.LengthUnit.INCHES);
+
+        Length result = demonstrateLengthAddition(l1, l2);
+
+        System.out.println("Addition Result: " + result);
+
+        Length converted =
+                demonstrateLengthConversion(l1,
                         Length.LengthUnit.INCHES);
 
-        System.out.println(result1); // 12.00 INCHES
+        System.out.println("Conversion Result: " + converted);
 
-        Length result2 =
-                demonstrateLengthConversion(2.0,
-                        Length.LengthUnit.YARDS,
-                        Length.LengthUnit.INCHES);
+        boolean equal =
+                demonstrateLengthEquality(l1,
+                        new Length(12.0,
+                                Length.LengthUnit.INCHES));
 
-        System.out.println(result2); // 72.00 INCHES
+        System.out.println("Equality Result: " + equal);
     }
 }
