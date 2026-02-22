@@ -60,6 +60,15 @@ public final class QuantityMeasurementApp {
 
         return LengthAddition.add(l1, l2);
     }
+    
+    //Addition with Target Unit Specification
+    public static Length demonstrateLengthAddition(
+            Length l1,
+            Length l2,
+            Length.LengthUnit targetUnit) {
+
+        return LengthAddition.add(l1, l2, targetUnit);
+    }
 
 
     public static void main(String[] args) {
@@ -83,5 +92,13 @@ public final class QuantityMeasurementApp {
                                 Length.LengthUnit.INCHES));
 
         System.out.println("Equality Result: " + equal);
+        
+        Length resultInYards =
+                demonstrateLengthAddition(
+                        l1,
+                        l2,
+                        Length.LengthUnit.YARDS);
+
+        System.out.println("UC7 Result (Yards): " + resultInYards);
     }
 }
