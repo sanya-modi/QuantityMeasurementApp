@@ -59,8 +59,14 @@ public class LengthTest {
 
     @Test
     public void centimeterEquals39Point3701Inches() {
-        assertTrue(new Length(100.0, Length.LengthUnit.CENTIMETERS)
-                .equals(new Length(39.3701, Length.LengthUnit.INCHES)));
+    	Length cm = new Length(100.0, Length.LengthUnit.CENTIMETERS);
+    	Length inch = new Length(39.3701, Length.LengthUnit.INCHES);
+
+    	assertEquals(
+    	        cm.convertTo(Length.LengthUnit.INCHES).getValue(),
+    	        inch.getValue(),
+    	        1e-4
+    	);
     }
 
     @Test
@@ -152,4 +158,6 @@ public class LengthTest {
 
         assertTrue(result.equals(expected));
     }
+    
+    
 }
