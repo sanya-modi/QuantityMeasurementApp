@@ -2,12 +2,9 @@ package com;
 
 public final class QuantityMeasurementApp {
 
-    private QuantityMeasurementApp() {
-        // prevent instantiation
-    }
+    private QuantityMeasurementApp() {}
 
-    //  EQUALITY 
-
+    // Equality
     public static boolean demonstrateLengthEquality(
             Length l1,
             Length l2) {
@@ -18,12 +15,11 @@ public final class QuantityMeasurementApp {
         return l1.equals(l2);
     }
 
-    // CONVERSION 
-
+    // Conversion
     public static Length demonstrateLengthConversion(
             double value,
-            Length.LengthUnit fromUnit,
-            Length.LengthUnit toUnit) {
+            LengthUnit fromUnit,
+            LengthUnit toUnit) {
 
         return new Length(value, fromUnit)
                 .convertTo(toUnit);
@@ -31,7 +27,7 @@ public final class QuantityMeasurementApp {
 
     public static Length demonstrateLengthConversion(
             Length length,
-            Length.LengthUnit toUnit) {
+            LengthUnit toUnit) {
 
         if (length == null)
             throw new IllegalArgumentException("Length cannot be null");
@@ -39,66 +35,31 @@ public final class QuantityMeasurementApp {
         return length.convertTo(toUnit);
     }
 
-    // ADDITION 
+    // UC6 Addition
     public static Length demonstrateLengthAddition(
             Length l1,
             Length l2) {
 
-        return LengthAddition.add(l1, l2);
+        return l1.add(l2);
     }
 
-    // Overloaded version (raw values)
-
-    public static Length demonstrateLengthAddition(
-            double value1,
-            Length.LengthUnit unit1,
-            double value2,
-            Length.LengthUnit unit2) {
-
-        Length l1 = new Length(value1, unit1);
-        Length l2 = new Length(value2, unit2);
-
-        return LengthAddition.add(l1, l2);
-    }
-    
-    //Addition with Target Unit Specification
+    // UC7 Addition
     public static Length demonstrateLengthAddition(
             Length l1,
             Length l2,
-            Length.LengthUnit targetUnit) {
+            LengthUnit targetUnit) {
 
-        return LengthAddition.add(l1, l2, targetUnit);
+        return l1.add(l2, targetUnit);
     }
-
 
     public static void main(String[] args) {
 
-        Length l1 = new Length(1.0, Length.LengthUnit.FEET);
-        Length l2 = new Length(12.0, Length.LengthUnit.INCHES);
+        Length l1 = new Length(1.0, LengthUnit.FEET);
+        Length l2 = new Length(12.0, LengthUnit.INCHES);
 
-        Length result = demonstrateLengthAddition(l1, l2);
-
-        System.out.println("Addition Result: " + result);
-
-        Length converted =
-                demonstrateLengthConversion(l1,
-                        Length.LengthUnit.INCHES);
-
-        System.out.println("Conversion Result: " + converted);
-
-        boolean equal =
-                demonstrateLengthEquality(l1,
-                        new Length(12.0,
-                                Length.LengthUnit.INCHES));
-
-        System.out.println("Equality Result: " + equal);
-        
-        Length resultInYards =
-                demonstrateLengthAddition(
-                        l1,
-                        l2,
-                        Length.LengthUnit.YARDS);
-
-        System.out.println("UC7 Result (Yards): " + resultInYards);
+        System.out.println(l1.convertTo(LengthUnit.INCHES));
+        System.out.println(l1.add(l2, LengthUnit.FEET));
+        System.out.println(new Length(36.0, LengthUnit.INCHES)
+                .equals(new Length(1.0, LengthUnit.YARDS)));
     }
 }
