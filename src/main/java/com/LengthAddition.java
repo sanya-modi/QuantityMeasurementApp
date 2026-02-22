@@ -21,4 +21,25 @@ public class LengthAddition {
 
         return new Length(result, l1.getUnit());
     }
+    
+    public static Length add(Length l1,
+            Length l2,
+            Length.LengthUnit targetUnit) {
+
+if (l1 == null || l2 == null)
+throw new IllegalArgumentException("Lengths cannot be null");
+
+if (targetUnit == null)
+throw new IllegalArgumentException("Target unit cannot be null");
+
+// Convert both to base unit (inches)
+double baseSum =
+l1.convertToBaseUnit() + l2.convertToBaseUnit();
+
+// Convert base sum to target unit
+double result =
+baseSum / targetUnit.getConversionFactor();
+
+return new Length(result, targetUnit);
+}
 }
