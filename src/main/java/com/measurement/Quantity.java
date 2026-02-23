@@ -1,7 +1,5 @@
 package com.measurement;
 
-import com.measurement.IMeasurable;
-
 import java.util.Objects;
 import java.util.function.DoubleBinaryOperator;
 
@@ -29,7 +27,7 @@ public class Quantity<U extends IMeasurable> {
         return unit;
     }
 
-    //   EQUALITY
+    // EQUALITY
 
     @Override
     public boolean equals(Object obj) {
@@ -40,6 +38,7 @@ public class Quantity<U extends IMeasurable> {
 
         Quantity<?> other = (Quantity<?>) obj;
 
+        // Prevent cross-category comparison
         if (!this.unit.getClass().equals(other.unit.getClass()))
             return false;
 
@@ -60,11 +59,15 @@ public class Quantity<U extends IMeasurable> {
         return "Quantity(" + value + ", " + unit.getUnitName() + ")";
     }
 
-    //   CONVERSION
+    // CONVERSION
 
     public Quantity<U> convertTo(U targetUnit) {
         if (targetUnit == null)
             throw new IllegalArgumentException("Target unit cannot be null");
+
+        // Prevent cross-category conversion
+        if (!this.unit.getClass().equals(targetUnit.getClass()))
+            throw new IllegalArgumentException("Incompatible measurement categories");
 
         double base = unit.convertToBaseUnit(value);
         double converted = targetUnit.convertFromBaseUnit(base);
@@ -72,7 +75,7 @@ public class Quantity<U extends IMeasurable> {
         return new Quantity<>(converted, targetUnit);
     }
 
-    //   PUBLIC ARITHMETIC METHODS
+    // PUBLIC ARITHMETIC METHODS
 
     public Quantity<U> add(Quantity<U> other) {
         return add(other, this.unit);
@@ -80,6 +83,7 @@ public class Quantity<U extends IMeasurable> {
 
     public Quantity<U> add(Quantity<U> other, U targetUnit) {
         validateArithmeticOperands(other, targetUnit, true);
+        unit.validateOperationSupport("ADD");
 
         double baseResult = performBaseArithmetic(other, ArithmeticOperation.ADD);
         double converted = targetUnit.convertFromBaseUnit(baseResult);
@@ -93,6 +97,7 @@ public class Quantity<U extends IMeasurable> {
 
     public Quantity<U> subtract(Quantity<U> other, U targetUnit) {
         validateArithmeticOperands(other, targetUnit, true);
+        unit.validateOperationSupport("SUBTRACT");
 
         double baseResult = performBaseArithmetic(other, ArithmeticOperation.SUBTRACT);
         double converted = targetUnit.convertFromBaseUnit(baseResult);
@@ -102,11 +107,12 @@ public class Quantity<U extends IMeasurable> {
 
     public double divide(Quantity<U> other) {
         validateArithmeticOperands(other, null, false);
+        unit.validateOperationSupport("DIVIDE");
 
         return performBaseArithmetic(other, ArithmeticOperation.DIVIDE);
     }
 
-    //   CENTRALIZED VALIDATION (DRY)
+    // CENTRALIZED VALIDATION (DRY)
 
     private void validateArithmeticOperands(
             Quantity<U> other,
@@ -127,7 +133,7 @@ public class Quantity<U extends IMeasurable> {
             throw new IllegalArgumentException("Target unit cannot be null");
     }
 
-    //   CORE BASE ARITHMETIC ENGINE
+    // CORE BASE ARITHMETIC ENGINE
 
     private double performBaseArithmetic(
             Quantity<U> other,
@@ -140,7 +146,7 @@ public class Quantity<U extends IMeasurable> {
         return operation.compute(thisBase, otherBase);
     }
 
-    //   ENUM STRATEGY FOR OPERATIONS
+    // ENUM STRATEGY FOR OPERATIONS
 
     private enum ArithmeticOperation {
 
@@ -165,7 +171,7 @@ public class Quantity<U extends IMeasurable> {
         }
     }
 
-    //   ROUNDING HELPER
+    // ROUNDING HELPER
 
     private double roundToTwoDecimals(double val) {
         return Math.round(val * 100.0) / 100.0;
