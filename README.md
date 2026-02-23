@@ -1,5 +1,4 @@
-## UC11 - Volume Measurement E
-quality, Conversion, and Addition (Litre, Millilitre, Gallon)
+## UC11 - Volume Measurement Equality, Conversion, and Addition (Litre, Millilitre, Gallon)
 
 ### Objective
 To extend the system to support volume measurements including equality comparison, unit conversion, and addition operations for Litre, Millilitre, and Gallon.
