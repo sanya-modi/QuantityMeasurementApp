@@ -1,68 +1,27 @@
 package com;
 
-import com.lengthmeasurement.Length;
-import com.lengthmeasurement.LengthUnit;
+import com.measurement.IMeasurable;
+import com.measurement.Quantity;
 
-public final class QuantityMeasurementApp {
+public class QuantityMeasurementApp {
 
-    private QuantityMeasurementApp() {}
+	 public static <U extends IMeasurable> boolean demonstrateEquality(
+	            Quantity<U> q1, Quantity<U> q2) {
+	        return q1.equals(q2);
+	    }
 
-    // Equality
-    public static boolean demonstrateLengthEquality(
-            Length l1,
-            Length l2) {
+	    public static <U extends IMeasurable> Quantity<U> demonstrateConversion(
+	            Quantity<U> quantity, U targetUnit) {
+	        return quantity.convertTo(targetUnit);
+	    }
 
-        if (l1 == null || l2 == null)
-            throw new IllegalArgumentException("Lengths cannot be null");
+	    public static <U extends IMeasurable> Quantity<U> demonstrateAddition(
+	            Quantity<U> q1, Quantity<U> q2) {
+	        return q1.add(q2);
+	    }
 
-        return l1.equals(l2);
-    }
-
-    // Conversion
-    public static Length demonstrateLengthConversion(
-            double value,
-            LengthUnit fromUnit,
-            LengthUnit toUnit) {
-
-        return new Length(value, fromUnit)
-                .convertTo(toUnit);
-    }
-
-    public static Length demonstrateLengthConversion(
-            Length length,
-            LengthUnit toUnit) {
-
-        if (length == null)
-            throw new IllegalArgumentException("Length cannot be null");
-
-        return length.convertTo(toUnit);
-    }
-
-    // UC6 Addition
-    public static Length demonstrateLengthAddition(
-            Length l1,
-            Length l2) {
-
-        return l1.add(l2);
-    }
-
-    // UC7 Addition
-    public static Length demonstrateLengthAddition(
-            Length l1,
-            Length l2,
-            LengthUnit targetUnit) {
-
-        return l1.add(l2, targetUnit);
-    }
-
-    public static void main(String[] args) {
-
-        Length l1 = new Length(1.0, LengthUnit.FEET);
-        Length l2 = new Length(12.0, LengthUnit.INCHES);
-
-        System.out.println(l1.convertTo(LengthUnit.INCHES));
-        System.out.println(l1.add(l2, LengthUnit.FEET));
-        System.out.println(new Length(36.0, LengthUnit.INCHES)
-                .equals(new Length(1.0, LengthUnit.YARDS)));
-    }
+	    public static <U extends IMeasurable> Quantity<U> demonstrateAddition(
+	            Quantity<U> q1, Quantity<U> q2, U targetUnit) {
+	        return q1.add(q2, targetUnit);
+	    }
 }
