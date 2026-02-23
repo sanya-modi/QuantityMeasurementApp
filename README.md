@@ -1,33 +1,39 @@
-## UC10 - Generic Quantity Class with Unit Interface for Multi-Category Support
+## UC11 - Volume Measurement E
+quality, Conversion, and Addition (Litre, Millilitre, Gallon)
 
 ### Objective
-To refactor the system by introducing a `Unit` interface that enables true generic support for multiple measurement categories such as Length and Weight.
+To extend the system to support volume measurements including equality comparison, unit conversion, and addition operations for Litre, Millilitre, and Gallon.
 
 ### Problem Statement
-With the introduction of multiple measurement types (Length and Weight), the existing design needed better abstraction to:
+The system currently supports Length and Weight categories.  
+The goal of this use case is to:
 
-- Support multiple categories cleanly
-- Avoid tight coupling between Quantity and specific Unit implementations
-- Enable future extension (e.g., Volume, Temperature)
-- Maintain type safety and scalability
+- Introduce Volume as a new measurement category
+- Support units such as Litre (L), Millilitre (mL), and Gallon (gal)
+- Enable equality comparison across volume units
+- Allow conversion between supported volume units
+- Implement addition of volume quantities
+- Maintain strict type safety between categories (Volume ≠ Length ≠ Weight)
 
 ### Implementation
-- Introduced a `Unit` interface to define common unit behaviors
-- Implemented category-specific enums (e.g., LengthUnit, WeightUnit) that implement the `Unit` interface
-- Updated the `Quantity` class to work with the `Unit` interface instead of a specific enum
-- Ensured conversion logic is delegated to respective unit implementations
-- Maintained type safety to prevent cross-category operations (Length ≠ Weight)
-- Updated test cases to validate multi-category behavior
+- Added a new VolumeUnit enum implementing the `Unit` interface
+- Defined appropriate conversion factors using a base unit strategy (e.g., Litre as base)
+- Implemented equality comparison across volume units
+- Enabled unit-to-unit conversion for volume measurements
+- Implemented addition of two volume quantities
+- Ensured cross-category operations are restricted
+- Added comprehensive test cases for equality, conversion, and addition
 
 ### Concepts Used
-- Interface-based Design
+- Multi-Category Architecture
+- Interface-Based Design
+- Base Unit Strategy
 - Polymorphism
-- Dependency Inversion Principle (DIP)
-- Separation of Concerns
-- Scalable Architecture
 - Type Safety
+- Open-Closed Principle (OCP)
 - Clean Code Practices
+- Unit Testing
 
 ### Outcome
-Successfully refactored the system into a fully generic and extensible measurement framework.  
-The application now supports multiple measurement categories using interface-driven design, making it scalable for future enhancements.
+Successfully extended the system to support volume measurements including equality, conversion, and arithmetic operations.  
+The application now functions as a scalable, multi-category measurement framework supporting Length, Weight, and Volume with consistent architecture.
