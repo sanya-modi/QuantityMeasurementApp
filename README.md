@@ -1,42 +1,45 @@
-## UC12 - Subtraction and Division Operations on Quantity Measurements
+## UC13 - Centralized Arithmetic Logic to Enforce DRY in Quantity Operations
 
 ### Objective
-To extend the Quantity system by implementing subtraction and division operations across supported measurement categories (Length, Weight, Volume).
+To refactor arithmetic operations (addition, subtraction, division) by centralizing the logic in order to strictly enforce the DRY (Don't Repeat Yourself) principle.
 
 ### Problem Statement
-The system currently supports equality, conversion, addition, and multi-category handling.  
+With multiple arithmetic operations implemented (add, subtract, divide), there was duplication in:
+
+- Base unit conversion logic
+- Category validation logic
+- Arithmetic execution steps
+- Result reconstruction logic
+
 The goal of this use case is to:
 
-- Implement subtraction between two quantities
-- Implement division operations on quantities
-- Ensure unit consistency during arithmetic operations
-- Maintain strict type safety across categories
-
-Example:
-- 5 ft - 2 ft
-- 2 kg - 500 g
-- 3 L - 500 mL
-- 10 ft ÷ 2
-- 4 kg ÷ 2
+- Eliminate repetitive arithmetic logic
+- Create a centralized internal operation handler
+- Improve maintainability and scalability
+- Ensure consistent behavior across all arithmetic methods
 
 ### Implementation
-- Added `subtract()` method in the `Quantity` class
-- Converted both operands to base unit before performing subtraction
-- Implemented `divide()` method to support division by scalar values
-- Ensured arithmetic operations are restricted within the same measurement category
-- Preserved immutability by returning new Quantity objects
-- Added comprehensive test cases for subtraction and division scenarios
+- Introduced a centralized private method to handle arithmetic operations
+- Abstracted common steps:
+  - Category validation
+  - Conversion to base unit
+  - Execution of arithmetic operation
+  - Conversion to target unit
+- Refactored existing methods (`add()`, `subtract()`, `divide()`) to delegate to centralized logic
+- Reduced code duplication significantly
+- Ensured no change in external behavior
+- Updated test cases to confirm consistent functionality
 
 ### Concepts Used
-- Arithmetic Operations on Domain Objects
-- Base Unit Strategy
-- Polymorphism
-- Type Safety
-- Immutability
+- DRY Principle
+- Refactoring
+- Template Method Pattern (Conceptually)
 - Clean Architecture
+- Code Maintainability
+- Separation of Concerns
 - Defensive Programming
 - Unit Testing
 
 ### Outcome
-Successfully implemented subtraction and division operations across multiple measurement categories.  
-The system now supports full arithmetic capabilities while maintaining scalable and type-safe architecture.
+Successfully centralized arithmetic logic, reducing duplication and improving code clarity.  
+The Quantity system is now more maintainable, scalable, and aligned with solid software design principles.
