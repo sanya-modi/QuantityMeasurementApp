@@ -1,33 +1,33 @@
-## UC9 - Weight Measurement
+## UC10 - Generic Quantity Class with Unit Interface for Multi-Category Support
 
 ### Objective
-To extend the Quantity Measurement system to support weight units in addition to length units.
+To refactor the system by introducing a `Unit` interface that enables true generic support for multiple measurement categories such as Length and Weight.
 
 ### Problem Statement
-Until now, the system handled only length measurements.  
-The goal of this use case is to:
+With the introduction of multiple measurement types (Length and Weight), the existing design needed better abstraction to:
 
-- Introduce weight measurement support
-- Add weight units such as Gram and Kilogram
-- Ensure accurate comparison and conversion within weight units
-- Prevent invalid comparisons between different measurement types (e.g., Length vs Weight)
+- Support multiple categories cleanly
+- Avoid tight coupling between Quantity and specific Unit implementations
+- Enable future extension (e.g., Volume, Temperature)
+- Maintain type safety and scalability
 
 ### Implementation
-- Added new weight units (e.g., Gram, Kilogram) in the Unit enum
-- Defined appropriate conversion factors for weight units
-- Ensured weight conversions are handled through base unit strategy
-- Implemented validation to restrict cross-type comparison (Length ≠ Weight)
-- Added test cases for weight comparison and conversion
+- Introduced a `Unit` interface to define common unit behaviors
+- Implemented category-specific enums (e.g., LengthUnit, WeightUnit) that implement the `Unit` interface
+- Updated the `Quantity` class to work with the `Unit` interface instead of a specific enum
+- Ensured conversion logic is delegated to respective unit implementations
+- Maintained type safety to prevent cross-category operations (Length ≠ Weight)
+- Updated test cases to validate multi-category behavior
 
 ### Concepts Used
-- Domain Extension
+- Interface-based Design
+- Polymorphism
+- Dependency Inversion Principle (DIP)
+- Separation of Concerns
+- Scalable Architecture
 - Type Safety
-- Enum Enhancement
-- Separation of Measurement Types
-- Base Unit Strategy
-- Clean Architecture
-- Unit Testing
+- Clean Code Practices
 
 ### Outcome
-Successfully extended the system to support weight measurements.  
-The application now handles multiple measurement categories while maintaining type safety and design consistency.
+Successfully refactored the system into a fully generic and extensible measurement framework.  
+The application now supports multiple measurement categories using interface-driven design, making it scalable for future enhancements.
