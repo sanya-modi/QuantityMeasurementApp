@@ -1,45 +1,41 @@
-## UC13 - Centralized Arithmetic Logic to Enforce DRY in Quantity Operations
+## UC14 - Temperature Measurement with Selective Arithmetic Support and IMeasurable Refactoring
 
 ### Objective
-To refactor arithmetic operations (addition, subtraction, division) by centralizing the logic in order to strictly enforce the DRY (Don't Repeat Yourself) principle.
+To introduce Temperature as a new measurement category while refactoring the architecture using an `IMeasurable` interface and supporting selective arithmetic operations.
 
 ### Problem Statement
-With multiple arithmetic operations implemented (add, subtract, divide), there was duplication in:
+Temperature differs from other measurement types (Length, Weight, Volume) because:
 
-- Base unit conversion logic
-- Category validation logic
-- Arithmetic execution steps
-- Result reconstruction logic
+- It requires offset-based conversion (e.g., Celsius ↔ Fahrenheit)
+- Not all arithmetic operations are logically valid
+- Addition of absolute temperatures is conceptually incorrect in many cases
 
 The goal of this use case is to:
 
-- Eliminate repetitive arithmetic logic
-- Create a centralized internal operation handler
-- Improve maintainability and scalability
-- Ensure consistent behavior across all arithmetic methods
+- Introduce Temperature units (Celsius, Fahrenheit, Kelvin)
+- Support equality comparison and conversion
+- Allow only valid arithmetic operations
+- Refactor system using `IMeasurable` abstraction for better flexibility
 
 ### Implementation
-- Introduced a centralized private method to handle arithmetic operations
-- Abstracted common steps:
-  - Category validation
-  - Conversion to base unit
-  - Execution of arithmetic operation
-  - Conversion to target unit
-- Refactored existing methods (`add()`, `subtract()`, `divide()`) to delegate to centralized logic
-- Reduced code duplication significantly
-- Ensured no change in external behavior
-- Updated test cases to confirm consistent functionality
+- Created a `TemperatureUnit` enum implementing the `Unit` interface
+- Implemented offset-based conversion logic (e.g., Celsius ↔ Fahrenheit)
+- Introduced `IMeasurable` interface to define measurable behavior
+- Ensured only meaningful arithmetic operations are permitted
+- Restricted invalid operations through validation
+- Updated the `Quantity` class to support selective arithmetic handling
+- Added comprehensive unit tests for temperature equality and conversion
 
 ### Concepts Used
-- DRY Principle
-- Refactoring
-- Template Method Pattern (Conceptually)
-- Clean Architecture
-- Code Maintainability
-- Separation of Concerns
+- Interface Segregation Principle (ISP)
+- Polymorphism
+- Offset-Based Conversion Logic
+- Selective Arithmetic Enforcement
+- Type Safety
+- Clean Architecture Refactoring
 - Defensive Programming
 - Unit Testing
 
 ### Outcome
-Successfully centralized arithmetic logic, reducing duplication and improving code clarity.  
-The Quantity system is now more maintainable, scalable, and aligned with solid software design principles.
+Successfully introduced Temperature measurement with proper conversion handling and selective arithmetic support.  
+Refactored the system using `IMeasurable` abstraction, making the architecture more flexible, extensible, and aligned with SOLID design principles.
