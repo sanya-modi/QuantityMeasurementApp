@@ -1,10 +1,14 @@
 package com.weightmeasurement;
 
-public enum WeightUnit {
+import com.measurement.IMeasurable;
 
-    GRAM(1.0),                 // Base
-    KILOGRAM(1000.0),          // 1 kg = 1000 g
-    POUND(453.59237);          // 1 lb = 453.59237 g (precise)
+public enum WeightUnit implements IMeasurable {
+
+    GRAM(1.0),            // Base unit
+    KILOGRAM(1000.0),
+    MILLIGRAM(0.001),
+    POUND(453.59237),
+    TONNE(1_000_000.0);
 
     private final double conversionFactor;
 
@@ -12,21 +16,23 @@ public enum WeightUnit {
         this.conversionFactor = conversionFactor;
     }
 
+    @Override
     public double getConversionFactor() {
         return conversionFactor;
     }
 
-    /**
-     * Convert this unit value to grams.
-     */
+    @Override
     public double convertToBaseUnit(double value) {
         return value * conversionFactor;
     }
 
-    /**
-     * Convert grams to this unit.
-     */
+    @Override
     public double convertFromBaseUnit(double baseValue) {
         return baseValue / conversionFactor;
+    }
+
+    @Override
+    public String getUnitName() {
+        return name();
     }
 }
