@@ -7,9 +7,12 @@ import org.junit.jupiter.api.Test;
 
 import com.lengthmeasurement.LengthUnit;
 import com.measurement.Quantity;
+import com.volumemeasurement.VolumeUnit;
 import com.weightmeasurement.WeightUnit;
 
 public class QuantityTest {
+	
+	private static final double EPSILON = 0.0001;
 	
     // LENGTH TESTS (Base = INCH)
 
@@ -235,5 +238,129 @@ public class QuantityTest {
 
         assertNotEquals(q, null);
     }
+    
+    // Helper Delegation Tests
+
+ @Test
+ void testRefactoring_Add_DelegatesViaHelper() {
+     Quantity<LengthUnit> result =
+             new Quantity<>(10.0, LengthUnit.FOOT)
+                     .add(new Quantity<>(5.0, LengthUnit.FOOT));
+
+     assertEquals(15.0, result.getValue(), EPSILON);
+ }
+
+ @Test
+ void testRefactoring_Subtract_DelegatesViaHelper() {
+     Quantity<LengthUnit> result =
+             new Quantity<>(10.0, LengthUnit.FOOT)
+                     .subtract(new Quantity<>(5.0, LengthUnit.FOOT));
+
+     assertEquals(5.0, result.getValue(), EPSILON);
+ }
+
+ @Test
+ void testRefactoring_Divide_DelegatesViaHelper() {
+     double result =
+             new Quantity<>(10.0, LengthUnit.FOOT)
+                     .divide(new Quantity<>(5.0, LengthUnit.FOOT));
+
+     assertEquals(2.0, result, EPSILON);
+ }
+
+//    Validation Centralization Tests
+
+ @Test
+ void testValidation_NullOperand_ConsistentAcrossOperations() {
+     Quantity<LengthUnit> q =
+             new Quantity<>(10.0, LengthUnit.FOOT);
+
+     assertThrows(IllegalArgumentException.class, () -> q.add(null));
+     assertThrows(IllegalArgumentException.class, () -> q.subtract(null));
+     assertThrows(IllegalArgumentException.class, () -> q.divide(null));
+ }
+
+ @Test
+ void testValidation_CrossCategory_ConsistentAcrossOperations() {
+     Quantity length = new Quantity<>(10.0, LengthUnit.FOOT);
+     Quantity weight = new Quantity<>(5.0, WeightUnit.KILOGRAM);
+
+     assertThrows(IllegalArgumentException.class, () -> length.add(weight));
+     assertThrows(IllegalArgumentException.class, () -> length.subtract(weight));
+     assertThrows(IllegalArgumentException.class, () -> length.divide(weight));
+ }
+
+ @Test
+ void testValidation_FiniteValue_ConsistentAcrossOperations() {
+     assertThrows(IllegalArgumentException.class,
+             () -> new Quantity<>(Double.NaN, LengthUnit.FOOT));
+ }
+
+ //   Enum Computation Tests
+
+ @Test
+ void testArithmeticOperation_Add_EnumComputation() {
+     Quantity<VolumeUnit> result =
+             new Quantity<>(5.0, VolumeUnit.LITRE)
+                     .add(new Quantity<>(5.0, VolumeUnit.LITRE));
+
+     assertEquals(10.0, result.getValue(), EPSILON);
+ }
+
+ @Test
+ void testArithmeticOperation_Subtract_EnumComputation() {
+     Quantity<LengthUnit> result =
+             new Quantity<>(10.0, LengthUnit.FOOT)
+                     .subtract(new Quantity<>(3.0, LengthUnit.FOOT));
+
+     assertEquals(7.0, result.getValue(), EPSILON);
+ }
+
+ @Test
+ void testArithmeticOperation_Divide_EnumComputation() {
+     double result =
+             new Quantity<>(10.0, LengthUnit.FOOT)
+                     .divide(new Quantity<>(2.0, LengthUnit.FOOT));
+
+     assertEquals(5.0, result, EPSILON);
+ }
+
+ @Test
+ void testArithmeticOperation_DivideByZero_EnumThrows() {
+     Quantity<LengthUnit> q =
+             new Quantity<>(10.0, LengthUnit.FOOT);
+
+     assertThrows(ArithmeticException.class,
+             () -> q.divide(new Quantity<>(0.0, LengthUnit.FOOT)));
+ }
+
+ //   Backward Compatibility Tests
+
+ @Test
+ void testAdd_UC12_BehaviorPreserved() {
+     Quantity<LengthUnit> result =
+             new Quantity<>(1.0, LengthUnit.FOOT)
+                     .add(new Quantity<>(12.0, LengthUnit.INCH));
+
+     assertEquals(2.0, result.getValue(), EPSILON);
+ }
+
+ @Test
+ void testSubtract_UC12_BehaviorPreserved() {
+     Quantity<LengthUnit> result =
+             new Quantity<>(10.0, LengthUnit.FOOT)
+                     .subtract(new Quantity<>(6.0, LengthUnit.INCH));
+
+     assertEquals(9.5, result.getValue(), EPSILON);
+ }
+
+ @Test
+ void testDivide_UC12_BehaviorPreserved() {
+     double result =
+             new Quantity<>(24.0, LengthUnit.INCH)
+                     .divide(new Quantity<>(2.0, LengthUnit.FOOT));
+
+     assertEquals(1.0, result, EPSILON);
+ }
 
 }
