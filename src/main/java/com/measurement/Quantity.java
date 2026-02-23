@@ -92,4 +92,73 @@ public class Quantity<U extends IMeasurable> {
     private double round(double value) {
         return Math.round(value * 100.0) / 100.0;
     }
+    
+    
+    private void validateOperand(Quantity<U> other) {
+        if (other == null)
+            throw new IllegalArgumentException("Quantity cannot be null");
+
+        if (this.unit == null || other.unit == null)
+            throw new IllegalArgumentException("Unit cannot be null");
+
+        if (!this.unit.getClass().equals(other.unit.getClass()))
+            throw new IllegalArgumentException("Incompatible measurement categories");
+
+        if (!Double.isFinite(this.value) || !Double.isFinite(other.value))
+            throw new IllegalArgumentException("Invalid numeric value");
+    }
+
+    private double roundToTwoDecimalPlaces(double val) {
+        return Math.round(val * 100.0) / 100.0;
+    }
+    
+    // Subtract – Implicit Target Unit
+    public Quantity<U> subtract(Quantity<U> other) {
+        validateOperand(other);
+
+        double thisBase = unit.convertToBaseUnit(this.value);
+        double otherBase = other.unit.convertToBaseUnit(other.value);
+
+        double baseResult = thisBase - otherBase;
+
+        double resultInThisUnit =
+                unit.convertFromBaseUnit(baseResult);
+
+        resultInThisUnit = roundToTwoDecimalPlaces(resultInThisUnit);
+
+        return new Quantity<>(resultInThisUnit, this.unit);
+    }
+    
+    //Subtract – Explicit Target Unit
+    public Quantity<U> subtract(Quantity<U> other, U targetUnit) {
+        validateOperand(other);
+
+        if (targetUnit == null)
+            throw new IllegalArgumentException("Target unit cannot be null");
+
+        double thisBase = unit.convertToBaseUnit(this.value);
+        double otherBase = other.unit.convertToBaseUnit(other.value);
+
+        double baseResult = thisBase - otherBase;
+
+        double result =
+                targetUnit.convertFromBaseUnit(baseResult);
+
+        result = roundToTwoDecimalPlaces(result);
+
+        return new Quantity<>(result, targetUnit);
+    }
+    
+    // Division (Returns double – Dimensionless)
+    public double divide(Quantity<U> other) {
+        validateOperand(other);
+
+        double thisBase = unit.convertToBaseUnit(this.value);
+        double otherBase = other.unit.convertToBaseUnit(other.value);
+
+        if (otherBase == 0.0)
+            throw new ArithmeticException("Division by zero");
+
+        return thisBase / otherBase;
+    }
 }
