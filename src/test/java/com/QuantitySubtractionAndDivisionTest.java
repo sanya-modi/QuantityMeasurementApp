@@ -6,10 +6,10 @@ import static org.junit.Assert.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
-import com.lengthmeasurement.LengthUnit;
-import com.measurement.*;
-import com.volumemeasurement.VolumeUnit;
-import com.weightmeasurement.WeightUnit;
+import com.quantitymeasurement.measurement.length.LengthUnit;
+import com.quantitymeasurement.measurement.*;
+import com.quantitymeasurement.measurement.volume.VolumeUnit;
+import com.quantitymeasurement.measurement.weight.WeightUnit;
 
 public class QuantitySubtractionAndDivisionTest {
 	

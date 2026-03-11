@@ -1,6 +1,6 @@
-package com.temperaturemeasurement;
+package com.quantitymeasurement.measurement.temperature;
 
-import com.measurement.IMeasurable;
+import com.quantitymeasurement.measurement.IMeasurable;
 
 public enum TemperatureUnit implements IMeasurable {
 

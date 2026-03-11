@@ -1,4 +1,4 @@
-package com.measurement;
+package com.quantitymeasurement.measurement;
 
 /**
  * Common contract for all measurable unit types.

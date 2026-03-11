@@ -1,18 +1,17 @@
-package com.weightmeasurement;
+package com.quantitymeasurement.measurement.length;
 
-import com.measurement.IMeasurable;
+import com.quantitymeasurement.measurement.IMeasurable;
 
-public enum WeightUnit implements IMeasurable {
+public enum LengthUnit implements IMeasurable {
 
-    GRAM(1.0),            // Base unit
-    KILOGRAM(1000.0),
-    MILLIGRAM(0.001),
-    POUND(453.59237),
-    TONNE(1_000_000.0);
+    INCH(1.0),          // Base unit
+    FOOT(12.0),
+    YARD(36.0),
+    CENTIMETER(0.393701);
 
     private final double conversionFactor;
 
-    WeightUnit(double conversionFactor) {
+    LengthUnit(double conversionFactor) {
         this.conversionFactor = conversionFactor;
     }
 

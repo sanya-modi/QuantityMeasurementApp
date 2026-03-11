@@ -1,4 +1,4 @@
-package com.measurement;
+package com.quantitymeasurement.measurement;
 
 import java.util.Objects;
 import java.util.function.DoubleBinaryOperator;

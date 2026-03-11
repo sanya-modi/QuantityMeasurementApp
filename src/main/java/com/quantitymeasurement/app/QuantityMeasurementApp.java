@@ -1,27 +1,22 @@
-package com;
+package com.quantitymeasurement.app;
 
-import com.measurement.IMeasurable;
-import com.measurement.Quantity;
+import com.quantitymeasurement.controller.QuantityMeasurementController;
+import com.quantitymeasurement.repository.QuantityMeasurementCacheRepository;
+import com.quantitymeasurement.service.QuantityMeasurementServiceImpl;
 
 public class QuantityMeasurementApp {
 
-	 public static <U extends IMeasurable> boolean demonstrateEquality(
-	            Quantity<U> q1, Quantity<U> q2) {
-	        return q1.equals(q2);
-	    }
+    public static void main(String[] args) {
 
-	    public static <U extends IMeasurable> Quantity<U> demonstrateConversion(
-	            Quantity<U> quantity, U targetUnit) {
-	        return quantity.convertTo(targetUnit);
-	    }
+        QuantityMeasurementCacheRepository repository =
+                QuantityMeasurementCacheRepository.getInstance();
 
-	    public static <U extends IMeasurable> Quantity<U> demonstrateAddition(
-	            Quantity<U> q1, Quantity<U> q2) {
-	        return q1.add(q2);
-	    }
+        QuantityMeasurementServiceImpl service =
+                new QuantityMeasurementServiceImpl(repository);
 
-	    public static <U extends IMeasurable> Quantity<U> demonstrateAddition(
-	            Quantity<U> q1, Quantity<U> q2, U targetUnit) {
-	        return q1.add(q2, targetUnit);
-	    }
+        QuantityMeasurementController controller =
+                new QuantityMeasurementController(service);
+
+        System.out.println("Quantity Measurement Application Started");
+    }
 }
