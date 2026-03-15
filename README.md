@@ -1,45 +1,22 @@
-## UC13 - Centralized Arithmetic Logic to Enforce DRY in Quantity Operations
+###  UC15: N-Tier Architecture Refactoring
 
-### Objective
-To refactor arithmetic operations (addition, subtraction, division) by centralizing the logic in order to strictly enforce the DRY (Don't Repeat Yourself) principle.
+- Description: UC15 restructures the Quantity Measurement App into a layered architecture by introducing Controller, Service, Repository, DTO, Model, and Entity layers. This separation improves maintainability, modularity, and testability while preserving all measurement logic implemented in previous use cases.
 
-### Problem Statement
-With multiple arithmetic operations implemented (add, subtract, divide), there was duplication in:
+- Architecture:
 
-- Base unit conversion logic
-- Category validation logic
-- Arithmetic execution steps
-- Result reconstruction logic
+  - **Controller** – Handles requests and delegates operations to the service layer.
+  - **Service** – Contains business logic and coordinates conversions and operations.
+  - **Repository** – Provides a cache-based storage layer.
+  - **DTO / Model / Entity** – Used for structured data transfer and internal representation.
 
-The goal of this use case is to:
+- Implementation:
 
-- Eliminate repetitive arithmetic logic
-- Create a centralized internal operation handler
-- Improve maintainability and scalability
-- Ensure consistent behavior across all arithmetic methods
+  - Introduced `QuantityMeasurementController`, `QuantityMeasurementServiceImpl`, and `QuantityMeasurementCacheRepository`.
+  - Added `QuantityDTO`, `QuantityModel`, and `QuantityMeasurementEntity`.
+  - Service performs **DTO → Model → Quantity → Model → DTO** transformation.
+  - Reuses the existing generic `Quantity` engine and unit enums from previous UCs.
 
-### Implementation
-- Introduced a centralized private method to handle arithmetic operations
-- Abstracted common steps:
-  - Category validation
-  - Conversion to base unit
-  - Execution of arithmetic operation
-  - Conversion to target unit
-- Refactored existing methods (`add()`, `subtract()`, `divide()`) to delegate to centralized logic
-- Reduced code duplication significantly
-- Ensured no change in external behavior
-- Updated test cases to confirm consistent functionality
+- Example:
 
-### Concepts Used
-- DRY Principle
-- Refactoring
-- Template Method Pattern (Conceptually)
-- Clean Architecture
-- Code Maintainability
-- Separation of Concerns
-- Defensive Programming
-- Unit Testing
-
-### Outcome
-Successfully centralized arithmetic logic, reducing duplication and improving code clarity.  
-The Quantity system is now more maintainable, scalable, and aligned with solid software design principles.
+  - `QuantityDTO(10, FEET, LENGTH) + QuantityDTO(12, INCHES, LENGTH) → QuantityDTO(11, FEET, LENGTH)`
+  - `QuantityDTO(100, CELSIUS, TEMPERATURE).equals(QuantityDTO(212, FAHRENHEIT, TEMPERATURE)) → true`
