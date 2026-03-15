@@ -1,5 +1,3 @@
-# Quantity Measurement App
-
 ## UC15 - N-Tier Architecture Refactoring for Quantity Measurement Application
 
 ### Objective
