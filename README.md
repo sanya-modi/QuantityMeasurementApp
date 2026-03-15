@@ -1,45 +1,27 @@
-## UC13 - Centralized Arithmetic Logic to Enforce DRY in Quantity Operations
+###  UC16: Database Persistence Layer Integration
 
-### Objective
-To refactor arithmetic operations (addition, subtraction, division) by centralizing the logic in order to strictly enforce the DRY (Don't Repeat Yourself) principle.
+* **Description:**
+  UC16 extends the N-Tier architecture by replacing the cache-based repository with a **database-backed persistence layer**. The application now stores and retrieves quantity measurements using JDBC and a connection pool. This improves scalability and enables persistent storage while maintaining the same layered architecture introduced in UC15.
 
-### Problem Statement
-With multiple arithmetic operations implemented (add, subtract, divide), there was duplication in:
+* **Architecture:**
 
-- Base unit conversion logic
-- Category validation logic
-- Arithmetic execution steps
-- Result reconstruction logic
+  * **Controller** – Handles incoming requests and forwards them to the service layer.
+  * **Service** – Performs business logic, conversions, and arithmetic operations.
+  * **Repository** – Provides **database-based storage** using JDBC instead of in-memory caching.
+  * **Connection Pool** – Manages reusable database connections for efficient access.
+  * **DTO / Model / Entity** – Continue to support structured data transfer and internal representation.
 
-The goal of this use case is to:
+* **Implementation:**
 
-- Eliminate repetitive arithmetic logic
-- Create a centralized internal operation handler
-- Improve maintainability and scalability
-- Ensure consistent behavior across all arithmetic methods
+  * Introduced `QuantityMeasurementDatabaseRepository` to replace the cache repository.
+  * Implemented database operations using **JDBC (`Connection`, `PreparedStatement`, `ResultSet`)**.
+  * Added `ConnectionPool` utility for managing database connections.
+  * Repository stores measurement results in the **`quantity_measurement` table**.
+  * Service layer continues performing **DTO → Model → Quantity → Model → DTO** transformations.
+  * Existing **Controller and Service logic remain unchanged**, ensuring backward compatibility.
 
-### Implementation
-- Introduced a centralized private method to handle arithmetic operations
-- Abstracted common steps:
-  - Category validation
-  - Conversion to base unit
-  - Execution of arithmetic operation
-  - Conversion to target unit
-- Refactored existing methods (`add()`, `subtract()`, `divide()`) to delegate to centralized logic
-- Reduced code duplication significantly
-- Ensured no change in external behavior
-- Updated test cases to confirm consistent functionality
+* **Example:**
 
-### Concepts Used
-- DRY Principle
-- Refactoring
-- Template Method Pattern (Conceptually)
-- Clean Architecture
-- Code Maintainability
-- Separation of Concerns
-- Defensive Programming
-- Unit Testing
-
-### Outcome
-Successfully centralized arithmetic logic, reducing duplication and improving code clarity.  
-The Quantity system is now more maintainable, scalable, and aligned with solid software design principles.
+  * `QuantityDTO(5, FEET, LENGTH) + QuantityDTO(24, INCHES, LENGTH) → QuantityDTO(7, FEET, LENGTH)`
+  * Result is **stored in the database** with a unique key.
+  * `find(key)` retrieves the stored measurement entity from the database.
