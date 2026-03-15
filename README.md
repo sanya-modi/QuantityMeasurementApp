@@ -1,22 +1,52 @@
-###  UC15: N-Tier Architecture Refactoring
+# Quantity Measurement App
 
-- Description: UC15 restructures the Quantity Measurement App into a layered architecture by introducing Controller, Service, Repository, DTO, Model, and Entity layers. This separation improves maintainability, modularity, and testability while preserving all measurement logic implemented in previous use cases.
+## UC15 - N-Tier Architecture Refactoring for Quantity Measurement Application
 
-- Architecture:
+### Objective
+To refactor the Quantity Measurement Application into a professional N-Tier architecture by separating responsibilities into distinct layers such as Controller, Service, Repository, and Model.
 
-  - **Controller** – Handles requests and delegates operations to the service layer.
-  - **Service** – Contains business logic and coordinates conversions and operations.
-  - **Repository** – Provides a cache-based storage layer.
-  - **DTO / Model / Entity** – Used for structured data transfer and internal representation.
+### Problem Statement
+The previous implementation (UC1–UC14) followed a largely monolithic structure where multiple responsibilities were handled within a single application flow.
 
-- Implementation:
+The goal of this use case is to:
 
-  - Introduced `QuantityMeasurementController`, `QuantityMeasurementServiceImpl`, and `QuantityMeasurementCacheRepository`.
-  - Added `QuantityDTO`, `QuantityModel`, and `QuantityMeasurementEntity`.
-  - Service performs **DTO → Model → Quantity → Model → DTO** transformation.
-  - Reuses the existing generic `Quantity` engine and unit enums from previous UCs.
+- Separate concerns across multiple architectural layers
+- Improve maintainability, scalability, and testability
+- Introduce clean architecture principles
+- Prepare the system for future extensions such as REST APIs, persistence layers, and dependency injection frameworks
 
-- Example:
+### Implementation
+- Refactored the application into a **4-Tier Architecture**:
+  - **Application Layer** – Entry point (`QuantityMeasurementApp`) that initializes components
+  - **Controller Layer** – Handles user interaction and delegates operations
+  - **Service Layer** – Contains business logic for comparison, conversion, and arithmetic operations
+  - **Repository Layer** – Manages storage of quantity measurement data
+  - **Entity / Model Layer** – Defines DTOs, internal models, and entities
 
-  - `QuantityDTO(10, FEET, LENGTH) + QuantityDTO(12, INCHES, LENGTH) → QuantityDTO(11, FEET, LENGTH)`
-  - `QuantityDTO(100, CELSIUS, TEMPERATURE).equals(QuantityDTO(212, FAHRENHEIT, TEMPERATURE)) → true`
+- Introduced supporting classes:
+  - `QuantityMeasurementController`
+  - `QuantityMeasurementServiceImpl`
+  - `QuantityMeasurementCacheRepository`
+  - `QuantityDTO`, `QuantityModel`, `QuantityMeasurementEntity`
+
+- Implemented design patterns:
+  - **Factory Pattern** – Object creation for controllers and services
+  - **Facade Pattern** – Controller provides simplified interface to system operations
+  - **Singleton Pattern** – Repository instance management
+  - **Dependency Injection** – Decoupling components
+  - **Interface Segregation Principle (ISP)** for service and repository interfaces
+
+### Concepts Used
+- N-Tier Architecture
+- Separation of Concerns
+- SOLID Principles
+- Factory Design Pattern
+- Facade Design Pattern
+- Singleton Pattern
+- Dependency Injection
+- DTO and POJO Design
+- Layered Architecture
+
+### Outcome
+Successfully transformed the application from a monolithic design into a scalable N-Tier architecture.  
+The system is now more modular, maintainable, and easier to test, while maintaining backward compatibility with all previous use cases (UC1–UC14).
