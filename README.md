@@ -1,27 +1,79 @@
-###  UC16: Database Persistence Layer Integration
+## UC16 - Database Integration with JDBC for Quantity Measurement Persistence
 
-* **Description:**
-  UC16 extends the N-Tier architecture by replacing the cache-based repository with a **database-backed persistence layer**. The application now stores and retrieves quantity measurements using JDBC and a connection pool. This improves scalability and enables persistent storage while maintaining the same layered architecture introduced in UC15.
+### Objective
+To introduce persistent database storage into the Quantity Measurement Application using JDBC.  
+This use case replaces the in-memory repository with a database-backed repository, enabling long-term data persistence, historical tracking, and scalable storage.
 
-* **Architecture:**
+### Problem Statement
+The previous implementation (UC1–UC15) stored measurement data in memory using a cache repository. While this worked for basic functionality, it had several limitations:
 
-  * **Controller** – Handles incoming requests and forwards them to the service layer.
-  * **Service** – Performs business logic, conversions, and arithmetic operations.
-  * **Repository** – Provides **database-based storage** using JDBC instead of in-memory caching.
-  * **Connection Pool** – Manages reusable database connections for efficient access.
-  * **DTO / Model / Entity** – Continue to support structured data transfer and internal representation.
+- Data was lost on application restart
+- No support for concurrent access
+- Limited querying capabilities
+- No structured schema validation
+- Difficult to perform analytics or reporting
+- Poor scalability for large datasets
 
-* **Implementation:**
+The goal of this use case is to integrate a relational database using JDBC while preserving the existing N-Tier architecture. :contentReference[oaicite:0]{index=0}
 
-  * Introduced `QuantityMeasurementDatabaseRepository` to replace the cache repository.
-  * Implemented database operations using **JDBC (`Connection`, `PreparedStatement`, `ResultSet`)**.
-  * Added `ConnectionPool` utility for managing database connections.
-  * Repository stores measurement results in the **`quantity_measurement` table**.
-  * Service layer continues performing **DTO → Model → Quantity → Model → DTO** transformations.
-  * Existing **Controller and Service logic remain unchanged**, ensuring backward compatibility.
+### Implementation
+- Introduced a new repository implementation:
+  - `QuantityMeasurementDatabaseRepository`
 
-* **Example:**
+- Integrated JDBC for database interaction:
+  - Connection management
+  - SQL query execution
+  - Result mapping to entity objects
 
-  * `QuantityDTO(5, FEET, LENGTH) + QuantityDTO(24, INCHES, LENGTH) → QuantityDTO(7, FEET, LENGTH)`
-  * Result is **stored in the database** with a unique key.
-  * `find(key)` retrieves the stored measurement entity from the database.
+- Implemented a **connection pool** to efficiently manage database connections.
+
+- Added configuration management:
+  - `application.properties` for database configuration
+  - `ApplicationConfig` class to load environment properties
+
+- Added database utilities:
+  - `ConnectionPool` for managing reusable connections
+
+- Created database schema:
+  - `quantity_measurement_entity` table
+  - `quantity_measurement_history` table for audit tracking
+
+- Implemented **parameterized SQL queries** to prevent SQL injection.
+
+- Extended exception hierarchy:
+  - Added `DatabaseException` for database-related errors.
+
+- Updated the service layer to support **both repositories**:
+  - Cache repository
+  - Database repository
+
+- Used **Dependency Injection** to dynamically switch repository implementations.
+
+- Added **Maven project structure**:
+  - `src/main/java`
+  - `src/main/resources`
+  - `src/test/java`
+
+- Added Maven configuration (`pom.xml`) with dependencies for:
+  - JDBC drivers
+  - H2 database (for testing)
+  - JUnit testing
+  - SLF4J logging
+  - Maven build plugins
+
+### Concepts Used
+- JDBC (Java Database Connectivity)
+- Connection Pooling
+- Maven Build System
+- Parameterized SQL Queries
+- Database Schema Design
+- Transaction Management
+- Repository Pattern
+- Dependency Injection
+- Exception Hierarchy
+- Logging Framework (SLF4J)
+- Integration Testing with H2 Database
+
+### Outcome
+Successfully integrated database persistence into the Quantity Measurement Application.  
+Measurement operations are now stored in a relational database, enabling data durability, querying capabilities, and scalable storage while maintaining compatibility with the existing N-Tier architecture. :contentReference[oaicite:1]{index=1}
