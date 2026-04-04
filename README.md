@@ -1,117 +1,94 @@
-## UC16 - Database Integration with JDBC for Quantity Measurement Persistence
+## UC19 - Quantity Measurement Microservices Project
 
-### Objective
-To introduce persistent database storage into the Quantity Measurement Application using JDBC.  
-This use case replaces the in-memory repository with a database-backed repository, enabling long-term data persistence, historical tracking, and scalable storage.
+## Project Overview
+This project was built as a full microservices-based backend for a quantity measurement application. Instead of keeping all logic in one monolith, we split responsibilities into focused services so each part can scale, evolve, and be maintained independently.
 
-### Problem Statement
-The previous implementation (UC1–UC15) stored measurement data in memory using a cache repository. While this worked for basic functionality, it had several limitations:
+The system supports user authentication, unit-based quantity operations, API routing, service discovery, and centralized monitoring. All services are designed around Spring Boot and communicate through a discovery-driven architecture.
 
-- Data was lost on application restart
-- No support for concurrent access
-- Limited querying capabilities
-- No structured schema validation
-- Difficult to perform analytics or reporting
-- Poor scalability for large datasets
+## What We Built
+We implemented five core services, each with a clear role:
 
-The goal of this use case is to integrate a relational database using JDBC while preserving the existing N-Tier architecture. :contentReference[oaicite:0]{index=0}
+- `eureka-server`: Service registry where all runtime services register themselves.
+- `api-gateway`: Single entry point for client traffic, routing requests to internal services.
+- `user-service`: User identity and authentication service supporting local JWT login and Google OAuth2 login.
+- `measurement-service`: Business service for quantity comparison, conversion, arithmetic, and operation history.
+- `admin-server`: Monitoring dashboard using Spring Boot Admin for service health and operational visibility.
 
-### Implementation
-- Introduced a new repository implementation:
-  - `QuantityMeasurementDatabaseRepository`
+This separation keeps infrastructure concerns, authentication concerns, and domain logic isolated and easier to manage.
 
-- Integrated JDBC for database interaction:
-  - Connection management
-  - SQL query execution
-  - Result mapping to entity objects
+## Architecture and Service Responsibilities
+### 1) Service Discovery (`eureka-server`)
+- Acts as the central registry.
+- Other services register their instances and resolve each other through service names rather than fixed host URLs.
+- Enables more flexible deployment and easier scaling.
 
-- Implemented a **connection pool** to efficiently manage database connections.
+### 2) API Gateway (`api-gateway`)
+- Provides one public API front door.
+- Routes measurement requests to `measurement-service` and auth/OAuth routes to `user-service`.
+- Applies CORS configuration for frontend integration.
+- Includes request/response timing logs through a global logging filter.
+- Exposes gateway and actuator endpoints to support observability.
 
-- Added configuration management:
-  - `application.properties` for database configuration
-  - `ApplicationConfig` class to load environment properties
+### 3) Authentication and User Management (`user-service`)
+- Supports email/password registration and login.
+- Generates JWT tokens after successful authentication.
+- Supports Google OAuth2 login and maps Google profile data to internal users.
+- Handles hybrid account behavior, allowing OAuth users to enable local credentials later.
+- Maintains user profile data and login timestamps.
+- Provides authenticated user status endpoints.
 
-- Added database utilities:
-  - `ConnectionPool` for managing reusable connections
+### 4) Quantity Measurement Domain (`measurement-service`)
+- Executes core measurement operations:
+  - compare
+  - convert
+  - add
+  - subtract
+  - multiply
+  - divide
+- Supports multiple measurement categories via unit abstractions (length, volume, weight, temperature).
+- Persists both successful operations and errored operations for audit/history use cases.
+- Provides global history and user-specific history endpoints.
+- Supports filtering by operation/type, counting successful operations, and deleting or clearing user history.
 
-- Created database schema:
-  - `quantity_measurement_entity` table
-  - `quantity_measurement_history` table for audit tracking
+### 5) Operational Monitoring (`admin-server`)
+- Uses Spring Boot Admin server capabilities.
+- Discovers registered services and surfaces health/actuator information.
+- Improves runtime visibility for troubleshooting and status checks.
 
-- Implemented **parameterized SQL queries** to prevent SQL injection.
+## Security Model
+Security is implemented with practical separation between identity and domain access:
 
-- Extended exception hierarchy:
-  - Added `DatabaseException` for database-related errors.
+- `user-service` is the token issuer.
+- JWT includes user identity claims such as user ID, role, and provider.
+- `measurement-service` validates JWT on incoming requests and extracts user ID from token claims.
+- Public operations are intentionally open for basic measurement usage, while user-specific history endpoints require authentication.
+- OAuth2 and JWT flows coexist so users can authenticate through either local credentials or Google.
 
-- Updated the service layer to support **both repositories**:
-  - Cache repository
-  - Database repository
+## Data and Persistence Strategy
+- Both `user-service` and `measurement-service` use JPA/Hibernate.
+- Configuration is primarily aligned for PostgreSQL in runtime settings.
+- Runtime dependencies include PostgreSQL, MySQL, and H2 connectors for flexible environment usage.
+- Measurement operations are persisted with enough context to support auditing, analytics, and personalized history.
 
-- Used **Dependency Injection** to dynamically switch repository implementations.
+## Observability and Operational Readiness
+Across services, actuator endpoints are enabled for health and runtime metadata. Combined with:
 
-- Added **Maven project structure**:
-  - `src/main/java`
-  - `src/main/resources`
-  - `src/test/java`
+- Eureka registration visibility,
+- gateway request logging,
+- and admin dashboard monitoring,
 
-- Added Maven configuration (`pom.xml`) with dependencies for:
-  - JDBC drivers
-  - H2 database (for testing)
-  - JUnit testing
-  - SLF4J logging
-  - Maven build plugins
+the platform provides a strong baseline for debugging and production-style diagnostics.
 
-### Concepts Used
-- JDBC (Java Database Connectivity)
-- Connection Pooling
-- Maven Build System
-- Parameterized SQL Queries
-- Database Schema Design
-- Transaction Management
-- Repository Pattern
-- Dependency Injection
-- Exception Hierarchy
-- Logging Framework (SLF4J)
-- Integration Testing with H2 Database
+## API and Documentation Support
+Both domain services include OpenAPI/Swagger support, making endpoint exploration easier for frontend and QA workflows.
 
-### Outcome
-Successfully integrated database persistence into the Quantity Measurement Application.  
-Measurement operations are now stored in a relational database, enabling data durability, querying capabilities, and scalable storage while maintaining compatibility with the existing N-Tier architecture. :contentReference[oaicite:1]{index=1}
+## Key Outcomes of This Microservices Implementation
+- Clean separation of infrastructure, identity, and business logic.
+- Discovery-based inter-service communication through Eureka.
+- Centralized API routing through a gateway instead of direct client-to-service coupling.
+- Real authentication layer with JWT and OAuth2 support.
+- Persistent business history for measurement operations, including error tracking.
+- Monitoring-ready ecosystem through actuator and admin tooling.
 
-## Authentication
-
-The project now supports both JWT authentication and Google OAuth2 login.
-
-### JWT endpoints
-
-- `POST /auth/register`
-- `POST /auth/login`
-
-Both endpoints return a bearer token that can be used in the `Authorization` header:
-
-`Authorization: Bearer <token>`
-
-### Google OAuth2 endpoints
-
-- `GET /auth/google` to start login
-- `GET /oauth2/authorization/google` (Spring Security default authorization endpoint)
-- `GET /login/oauth2/code/google` (Google redirect callback endpoint handled by Spring Security)
-
-On successful Google login, the app redirects to `APP_REDIRECT_URI` and appends the JWT as query parameters.
-
-### Required environment variables for Google OAuth2
-
-- `GOOGLE_CLIENT_ID`
-- `GOOGLE_CLIENT_SECRET`
-- `APP_REDIRECT_URI` (recommended: `http://localhost:3000/oauth-callback`)
-- `CORS_ALLOWED_ORIGINS` (recommended: `http://localhost,http://localhost:8080`)
-
-### Google Console mapping (your current setup)
-
-- Authorized JavaScript origins:
-  - `http://localhost`
-  - `http://localhost:8080`
-- Authorized redirect URI:
-  - `http://localhost:8080/login/oauth2/code/google`
-
-No real OAuth client secrets are stored in repository properties.
+## Overall Result
+This project delivers a complete, extensible microservices foundation for a quantity measurement platform. It demonstrates practical enterprise patterns: discovery, gateway routing, token-based security, OAuth2 integration, service-level persistence, and operational monitoring, all organized as independently deployable Spring Boot services.
