@@ -1,0 +1,75 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:3000"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+              - HEAD
+              - PATCH
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+            maxAge: 3600
+            exposedHeaders:
+              - "Authorization"
+              - "Content-Type"
+      routes:
+        - id: measurement-route
+          uri: lb://measurement-service
+          predicates:
+            - Path=/api/v1/quantities/**
+          filters:
+            - StripPrefix=0
+        - id: user-auth-route
+          uri: lb://user-service
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=0
+        - id: oauth2-route
+          uri: lb://user-service
+          predicates:
+            - Path=/oauth2/**
+          filters:
+            - StripPrefix=0
+        - id: oauth2-login-callback-route
+          uri: lb://user-service
+          predicates:
+            - Path=/login/oauth2/code/**
+          filters:
+            - StripPrefix=0
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway,metrics,env,loggers,threaddump
+  endpoint:
+    health:
+      show-details: always

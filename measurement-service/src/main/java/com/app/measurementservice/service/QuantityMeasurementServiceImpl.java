@@ -1,0 +1,329 @@
+package com.app.measurementservice.service;
+
+import com.app.measurementservice.unit.Quantity;
+import com.app.measurementservice.dto.QuantityDTO;
+import com.app.measurementservice.dto.QuantityMeasurementDTO;
+import com.app.measurementservice.exception.QuantityMeasurementException;
+import com.app.measurementservice.model.QuantityMeasurementEntity;
+import com.app.measurementservice.repository.QuantityMeasurementRepository;
+import com.app.measurementservice.unit.IMeasurable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+public class QuantityMeasurementServiceImpl implements IQuantityMeasurementService {
+
+    private static final Logger logger = LoggerFactory.getLogger(QuantityMeasurementServiceImpl.class);
+
+    @Autowired
+    private QuantityMeasurementRepository repository;
+
+    @Override
+    public QuantityMeasurementDTO compareQuantities(QuantityDTO quantity1, QuantityDTO quantity2, Long userId) {
+        QuantityMeasurementEntity entity = new QuantityMeasurementEntity();
+        entity.setUserId(userId);
+        try {
+            validateInputs(quantity1, quantity2);
+            validateSameCategory(quantity1, quantity2);
+
+            IMeasurable unit1 = IMeasurable.getUnitByName(quantity1.getUnit(), quantity1.getMeasurementType());
+            IMeasurable unit2 = IMeasurable.getUnitByName(quantity2.getUnit(), quantity2.getMeasurementType());
+
+            Quantity<IMeasurable> q1 = new Quantity<>(quantity1.getValue(), unit1);
+            Quantity<IMeasurable> q2 = new Quantity<>(quantity2.getValue(), unit2);
+
+            boolean isEqual = q1.equals(q2);
+
+            populateEntity(entity, quantity1, quantity2, "compare");
+            entity.setResultString(String.valueOf(isEqual));
+            entity.setError(false);
+            repository.save(entity);
+            logger.debug("COMPARE persisted for user: {}", userId);
+
+            return QuantityMeasurementDTO.fromEntity(entity);
+
+        } catch (Exception e) {
+            persistError(entity, quantity1, quantity2, "compare", e);
+            throw new QuantityMeasurementException("compare Error: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public QuantityMeasurementDTO convertQuantity(QuantityDTO quantity1, QuantityDTO quantity2, Long userId) {
+        QuantityMeasurementEntity entity = new QuantityMeasurementEntity();
+        entity.setUserId(userId);
+        try {
+            if (quantity1 == null) {
+                throw new IllegalArgumentException("Source quantity cannot be null");
+            }
+
+            IMeasurable sourceUnit = IMeasurable.getUnitByName(quantity1.getUnit(), quantity1.getMeasurementType());
+            IMeasurable targetUnit = IMeasurable.getUnitByName(quantity2.getUnit(), quantity2.getMeasurementType());
+
+            double convertedValue = Quantity.convert(quantity1.getValue(), sourceUnit, targetUnit);
+
+            populateEntity(entity, quantity1, quantity2, "convert");
+            entity.setResultValue(convertedValue);
+            entity.setError(false);
+            repository.save(entity);
+            logger.debug("CONVERT persisted for user: {}", userId);
+
+            return QuantityMeasurementDTO.fromEntity(entity);
+
+        } catch (Exception e) {
+            persistError(entity, quantity1, quantity2, "convert", e);
+            throw new QuantityMeasurementException("convert Error: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public QuantityMeasurementDTO addQuantities(QuantityDTO quantity1, QuantityDTO quantity2, Long userId) {
+        QuantityMeasurementEntity entity = new QuantityMeasurementEntity();
+        entity.setUserId(userId);
+        try {
+            validateInputs(quantity1, quantity2);
+            validateSameCategory(quantity1, quantity2);
+
+            IMeasurable unit1 = IMeasurable.getUnitByName(quantity1.getUnit(), quantity1.getMeasurementType());
+            IMeasurable unit2 = IMeasurable.getUnitByName(quantity2.getUnit(), quantity2.getMeasurementType());
+            IMeasurable targetUnitObj = unit1;
+
+            Quantity<IMeasurable> q1 = new Quantity<>(quantity1.getValue(), unit1);
+            Quantity<IMeasurable> q2 = new Quantity<>(quantity2.getValue(), unit2);
+
+            Quantity<IMeasurable> result = q1.add(q2, targetUnitObj);
+
+            populateEntity(entity, quantity1, quantity2, "add");
+            entity.setResultValue(result.getValue());
+            entity.setResultUnit(result.getUnit().getUnitName());
+            entity.setResultMeasurementType(result.getUnit().getMeasurementType());
+            entity.setError(false);
+            repository.save(entity);
+            logger.debug("ADD persisted for user: {}", userId);
+
+            return QuantityMeasurementDTO.fromEntity(entity);
+
+        } catch (Exception e) {
+            persistError(entity, quantity1, quantity2, "add", e);
+            throw new QuantityMeasurementException("add Error: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public QuantityMeasurementDTO subtractQuantities(QuantityDTO quantity1, QuantityDTO quantity2, Long userId) {
+        QuantityMeasurementEntity entity = new QuantityMeasurementEntity();
+        entity.setUserId(userId);
+        try {
+            validateInputs(quantity1, quantity2);
+            validateSameCategory(quantity1, quantity2);
+
+            IMeasurable unit1 = IMeasurable.getUnitByName(quantity1.getUnit(), quantity1.getMeasurementType());
+            IMeasurable unit2 = IMeasurable.getUnitByName(quantity2.getUnit(), quantity2.getMeasurementType());
+            IMeasurable targetUnitObj = unit1;
+
+            Quantity<IMeasurable> q1 = new Quantity<>(quantity1.getValue(), unit1);
+            Quantity<IMeasurable> q2 = new Quantity<>(quantity2.getValue(), unit2);
+
+            Quantity<IMeasurable> result = q1.subtract(q2, targetUnitObj);
+
+            populateEntity(entity, quantity1, quantity2, "subtract");
+            entity.setResultValue(result.getValue());
+            entity.setResultUnit(result.getUnit().getUnitName());
+            entity.setResultMeasurementType(result.getUnit().getMeasurementType());
+            entity.setError(false);
+            repository.save(entity);
+            logger.debug("SUBTRACT persisted for user: {}", userId);
+
+            return QuantityMeasurementDTO.fromEntity(entity);
+
+        } catch (Exception e) {
+            persistError(entity, quantity1, quantity2, "subtract", e);
+            throw new QuantityMeasurementException("subtract Error: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public QuantityMeasurementDTO multiplyQuantities(QuantityDTO quantity1, QuantityDTO quantity2, Long userId) {
+        QuantityMeasurementEntity entity = new QuantityMeasurementEntity();
+        entity.setUserId(userId);
+        try {
+            validateInputs(quantity1, quantity2);
+            validateSameCategory(quantity1, quantity2);
+
+            IMeasurable unit1 = IMeasurable.getUnitByName(quantity1.getUnit(), quantity1.getMeasurementType());
+            IMeasurable unit2 = IMeasurable.getUnitByName(quantity2.getUnit(), quantity2.getMeasurementType());
+            IMeasurable targetUnitObj = unit1;
+
+            Quantity<IMeasurable> q1 = new Quantity<>(quantity1.getValue(), unit1);
+            Quantity<IMeasurable> q2 = new Quantity<>(quantity2.getValue(), unit2);
+
+            Quantity<IMeasurable> result = q1.multiply(q2, targetUnitObj);
+
+            populateEntity(entity, quantity1, quantity2, "multiply");
+            entity.setResultValue(result.getValue());
+            entity.setResultUnit(result.getUnit().getUnitName());
+            entity.setResultMeasurementType(result.getUnit().getMeasurementType());
+            entity.setError(false);
+            repository.save(entity);
+            logger.debug("MULTIPLY persisted for user: {}", userId);
+
+            return QuantityMeasurementDTO.fromEntity(entity);
+
+        } catch (Exception e) {
+            persistError(entity, quantity1, quantity2, "multiply", e);
+            throw new QuantityMeasurementException("multiply Error: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public QuantityMeasurementDTO divideQuantities(QuantityDTO quantity1, QuantityDTO quantity2, Long userId) {
+        QuantityMeasurementEntity entity = new QuantityMeasurementEntity();
+        entity.setUserId(userId);
+        try {
+            validateInputs(quantity1, quantity2);
+            validateSameCategory(quantity1, quantity2);
+
+            IMeasurable unit1 = IMeasurable.getUnitByName(quantity1.getUnit(), quantity1.getMeasurementType());
+            IMeasurable unit2 = IMeasurable.getUnitByName(quantity2.getUnit(), quantity2.getMeasurementType());
+
+            Quantity<IMeasurable> q1 = new Quantity<>(quantity1.getValue(), unit1);
+            Quantity<IMeasurable> q2 = new Quantity<>(quantity2.getValue(), unit2);
+
+            double result = q1.divide(q2);
+
+            populateEntity(entity, quantity1, quantity2, "divide");
+            entity.setResultValue(result);
+            entity.setError(false);
+            repository.save(entity);
+            logger.debug("DIVIDE persisted for user: {}", userId);
+
+            return QuantityMeasurementDTO.fromEntity(entity);
+
+        } catch (ArithmeticException e) {
+            persistError(entity, quantity1, quantity2, "divide", e);
+            throw e;
+        } catch (Exception e) {
+            persistError(entity, quantity1, quantity2, "divide", e);
+            throw new QuantityMeasurementException("divide Error: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public List<QuantityMeasurementDTO> getHistoryByOperation(String operation) {
+        List<QuantityMeasurementEntity> entities = repository.findByOperation(operation);
+        return QuantityMeasurementDTO.fromEntityList(entities);
+    }
+
+    @Override
+    public List<QuantityMeasurementDTO> getHistoryByMeasurementType(String measurementType) {
+        List<QuantityMeasurementEntity> entities = repository.findByThisMeasurementType(measurementType);
+        return QuantityMeasurementDTO.fromEntityList(entities);
+    }
+
+    @Override
+    public long getCountByOperation(String operation) {
+        return repository.countByOperationAndErrorFalse(operation);
+    }
+
+    @Override
+    public List<QuantityMeasurementDTO> getErrorHistory() {
+        List<QuantityMeasurementEntity> entities = repository.findByErrorTrue();
+        return QuantityMeasurementDTO.fromEntityList(entities);
+    }
+
+    @Override
+    public List<QuantityMeasurementDTO> getUserHistory(Long userId) {
+        List<QuantityMeasurementEntity> entities = repository.findByUserIdOrderByCreatedAtDesc(userId);
+        return QuantityMeasurementDTO.fromEntityList(entities);
+    }
+
+    @Override
+    public List<QuantityMeasurementDTO> getUserHistoryByOperation(Long userId, String operation) {
+        List<QuantityMeasurementEntity> entities = repository.findByUserIdAndOperation(userId, operation);
+        return QuantityMeasurementDTO.fromEntityList(entities);
+    }
+
+    @Override
+    public List<QuantityMeasurementDTO> getUserHistoryByMeasurementType(Long userId, String measurementType) {
+        List<QuantityMeasurementEntity> entities = repository.findByUserIdAndThisMeasurementType(userId, measurementType);
+        return QuantityMeasurementDTO.fromEntityList(entities);
+    }
+
+    @Override
+    public long getUserCountByOperation(Long userId, String operation) {
+        return repository.countByUserIdAndOperationAndErrorFalse(userId, operation);
+    }
+
+    @Override
+    public List<QuantityMeasurementDTO> getUserErrorHistory(Long userId) {
+        List<QuantityMeasurementEntity> entities = repository.findByUserIdAndErrorTrue(userId);
+        return QuantityMeasurementDTO.fromEntityList(entities);
+    }
+
+    @Override
+    @Transactional
+    public void deleteUserHistoryById(Long userId, Long historyId) {
+        if (userId == null) {
+            throw new QuantityMeasurementException("Authenticated user is required to delete history.");
+        }
+        QuantityMeasurementEntity entity = repository.findByIdAndUserId(historyId, userId)
+                .orElseThrow(() -> new QuantityMeasurementException("History item not found for this user."));
+        repository.delete(entity);
+        logger.info("Deleted history item {} for user: {}", historyId, userId);
+    }
+
+    @Override
+    @Transactional
+    public void clearUserHistory(Long userId) {
+        if (userId == null) {
+            throw new QuantityMeasurementException("Authenticated user is required to clear history.");
+        }
+        repository.deleteByUserId(userId);
+        logger.info("Cleared all history for user: {}", userId);
+    }
+
+    private void validateInputs(QuantityDTO quantity1, QuantityDTO quantity2) {
+        if (quantity1 == null || quantity2 == null) {
+            throw new IllegalArgumentException("Quantities cannot be null");
+        }
+    }
+
+    private void validateSameCategory(QuantityDTO quantity1, QuantityDTO quantity2) {
+        if (!quantity1.getMeasurementType().equals(quantity2.getMeasurementType())) {
+            throw new IllegalArgumentException("Cannot perform arithmetic between different measurement categories: "
+                    + quantity1.getMeasurementType() + " and " + quantity2.getMeasurementType());
+        }
+    }
+
+    private void populateEntity(QuantityMeasurementEntity entity, QuantityDTO q1, QuantityDTO q2, String operation) {
+        if (q1 != null) {
+            entity.setThisValue(q1.getValue());
+            entity.setThisUnit(q1.getUnit());
+            entity.setThisMeasurementType(q1.getMeasurementType());
+        }
+        if (q2 != null) {
+            entity.setThatValue(q2.getValue());
+            entity.setThatUnit(q2.getUnit());
+            entity.setThatMeasurementType(q2.getMeasurementType());
+        }
+        entity.setOperation(operation);
+    }
+
+    private void persistError(QuantityMeasurementEntity entity, QuantityDTO q1, QuantityDTO q2, String operation, Exception e) {
+        try {
+            populateEntity(entity, q1, q2, operation);
+            entity.setError(true);
+            entity.setErrorMessage(e.getMessage());
+            repository.save(entity);
+            logger.warn("Operation {} failed and was persisted as error: {}", operation, e.getMessage());
+        } catch (Exception ignored) {
+            logger.warn("Failed to persist operation error for {}", operation);
+        }
+    }
+}
+
