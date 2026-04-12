@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: ${SERVER_PORT}
 
 spring:
   main:
@@ -7,9 +7,9 @@ spring:
   application:
     name: measurement-service
   datasource:
-    url: ${DATABASE_URL:}
-    username: ${DATABASE_USERNAME:}
-    password: ${DATABASE_PASSWORD:}
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -21,7 +21,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: ${EUREKA_DEFAULT_ZONE}
     fetch-registry: true
     register-with-eureka: true
   instance:
@@ -40,5 +40,5 @@ management:
 
 app:
   jwt:
-    secret: ${JWT_SECRET:VGhpc0lzQVNlY3VyZVNob3VsZsdjfvdsFzdDMyQ2hhcmFjdGVyc0xvbmdGb3JKV1Q=}
+    secret: ${JWT_SECRET}
     expiration: 86400000

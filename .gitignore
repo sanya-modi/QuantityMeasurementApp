@@ -1,1 +1,151 @@
-/.metadata/
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.local
+*.secret
+*.secrets
+
+# Maven / Java build output
+target/
+**/target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+*.log
+hs_err_pid*
+replay_pid*
+
+# Keep nested source folders named target/build if they are real source fixtures
+!**/src/main/**/target/
+!**/src/test/**/target/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Maven wrapper binary cache
+**/.mvn/wrapper/maven-wrapper.jar
+
+# Gradle / generic build output
+.gradle/
+build/
+**/build/
+out/
+**/out/
+bin/
+**/bin/
+dist/
+**/dist/
+
+# Node / frontend output if frontend is committed in or beside this repo
+node_modules/
+**/node_modules/
+coverage/
+**/coverage/
+.next/
+.nuxt/
+.vite/
+.cache/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDEs and editors
+.idea/
+**/.idea/
+.vscode/
+**/.vscode/
+*.iws
+*.iml
+*.ipr
+
+# Eclipse / STS
+.metadata/
+.apt_generated/
+**/.apt_generated/
+.classpath
+**/.classpath
+.factorypath
+**/.factorypath
+.project
+**/.project
+.settings/
+**/.settings/
+.springBeans
+**/.springBeans
+.sts4-cache/
+**/.sts4-cache/
+
+# NetBeans
+nbproject/private/
+**/nbproject/private/
+nbbuild/
+**/nbbuild/
+nbdist/
+**/nbdist/
+.nb-gradle/
+**/.nb-gradle/
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs and runtime files
+logs/
+**/logs/
+*.pid
+*.seed
+*.pid.lock
+
+# Local databases and generated data
+data/
+**/data/
+*.db
+*.mv.db
+*.trace.db
+*.h2.db
+*.sqlite
+*.sqlite3
+
+# Docker local overrides
+docker-compose.override.yml
+docker-compose*.local.yml
+
+# Generated reports and temp files
+tmp/
+temp/
+**/tmp/
+**/temp/
+*.tmp
+*.bak
+*.swp
+*.swo
+
+# Docker
+*.tar
+*.tar.gz
+docker-data/
+
+# Spring Boot
+*.log
+spring.log
+
+# IntelliJ extra
+.idea_modules/
+*.name
+
+# Local config overrides
+application-local.yml
+application-local.yaml
+application-dev.yml
+
+# Prevent accidental commits
+*.env.backup
+.env.production
+
+logs/
+**/logs/
