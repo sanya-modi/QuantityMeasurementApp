@@ -36,7 +36,7 @@ services:
         JAVA_RUNTIME_IMAGE: ${QMA_JAVA_RUNTIME_IMAGE}
         APP_USER_ID: ${QMA_APP_USER_ID}
         SERVICE_PORT: ${QMA_EUREKA_SERVICE_PORT}
-    image: sanyamodi-eureka-server:latest
+    image: sanyamodi/eureka-server:latest
     container_name: quantity-eureka-server
     environment:
       JAVA_OPTS: ${QMA_EUREKA_JAVA_OPTS}
@@ -73,7 +73,7 @@ services:
         JAVA_RUNTIME_IMAGE: ${QMA_JAVA_RUNTIME_IMAGE}
         APP_USER_ID: ${QMA_APP_USER_ID}
         SERVICE_PORT: ${QMA_MEASUREMENT_SERVICE_PORT}
-    image: sanyamodi-measurement-service:latest
+    image: sanyamodi/measurement-service:latest
     container_name: quantity-measurement-service
     environment:
       JAVA_OPTS: ${QMA_MEASUREMENT_JAVA_OPTS}
@@ -120,7 +120,7 @@ services:
         JAVA_RUNTIME_IMAGE: ${QMA_JAVA_RUNTIME_IMAGE}
         APP_USER_ID: ${QMA_APP_USER_ID}
         SERVICE_PORT: ${QMA_USER_SERVICE_PORT}
-    image: sanyamodi-user-service:latest
+    image: sanyamodi/user-service:latest
     container_name: quantity-user-service
     environment:
       JAVA_OPTS: ${QMA_USER_JAVA_OPTS}
@@ -172,7 +172,7 @@ services:
         JAVA_RUNTIME_IMAGE: ${QMA_JAVA_RUNTIME_IMAGE}
         APP_USER_ID: ${QMA_APP_USER_ID}
         SERVICE_PORT: ${QMA_ADMIN_SERVICE_PORT}
-    image: sanyamodi-admin-server:latest
+    image: sanyamodi/admin-server:latest
     container_name: quantity-admin-server
     environment:
       JAVA_OPTS: ${QMA_ADMIN_JAVA_OPTS}
@@ -210,7 +210,7 @@ services:
         JAVA_RUNTIME_IMAGE: ${QMA_JAVA_RUNTIME_IMAGE}
         APP_USER_ID: ${QMA_APP_USER_ID}
         SERVICE_PORT: ${QMA_GATEWAY_SERVICE_PORT}
-    image: sanyamodi-api-gateway:latest
+    image: sanyamodi/api-gateway:latest
     container_name: quantity-api-gateway
     environment:
       JAVA_OPTS: ${QMA_GATEWAY_JAVA_OPTS}
@@ -247,7 +247,7 @@ services:
     build:
       context: ../QuantityMeasurementAppFrontend
       dockerfile: Dockerfile
-    image: sanyamodi-frontend:latest
+    image: sanyamodi/frontend:latest
     container_name: quantity-frontend
     ports:
       - "${QMA_FRONTEND_HOST_PORT}:${QMA_FRONTEND_CONTAINER_PORT}"
