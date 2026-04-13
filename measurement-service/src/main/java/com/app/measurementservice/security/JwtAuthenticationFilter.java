@@ -83,5 +83,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         byte[] keyBytes = Decoders.BASE64.decode(appProperties.getJwt().getSecret());
         return Keys.hmacShaKeyFor(keyBytes);
     }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+
+        return path.startsWith("/api/v1/quantities/compare") ||
+                path.startsWith("/api/v1/quantities/convert") ||
+                path.startsWith("/api/v1/quantities/add") ||
+                path.startsWith("/api/v1/quantities/subtract") ||
+                path.startsWith("/api/v1/quantities/multiply") ||
+                path.startsWith("/api/v1/quantities/divide");
+    }
 }
 
