@@ -9,6 +9,7 @@ public class AppProperties {
 
     private OAuth2Properties oauth2 = new OAuth2Properties();
     private JwtProperties jwt = new JwtProperties();
+    private CorsProperties cors = new CorsProperties();
 
     public OAuth2Properties getOauth2() {
         return oauth2;
@@ -24,6 +25,14 @@ public class AppProperties {
 
     public void setJwt(JwtProperties jwt) {
         this.jwt = jwt;
+    }
+
+    public CorsProperties getCors() {
+        return cors;
+    }
+
+    public void setCors(CorsProperties cors) {
+        this.cors = cors;
     }
 
     public static class OAuth2Properties {
@@ -56,6 +65,18 @@ public class AppProperties {
 
         public void setExpirationMs(long expirationMs) {
             this.expirationMs = expirationMs;
+        }
+    }
+
+    public static class CorsProperties {
+        private String allowedOrigins = "http://localhost:3000";
+
+        public String getAllowedOrigins() {
+            return allowedOrigins;
+        }
+
+        public void setAllowedOrigins(String allowedOrigins) {
+            this.allowedOrigins = allowedOrigins;
         }
     }
 }
