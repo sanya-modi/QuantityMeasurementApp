@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -85,12 +86,11 @@ public class AuthController {
     @GetMapping("/user")
     @Operation(summary = "Get current authenticated user information")
     public ResponseEntity<UserDTO> getCurrentUser(Authentication authentication) {
-        if (authentication == null || authentication.getPrincipal() == null) {
+        User user = resolveUser(authentication);
+        if (user == null) {
             return ResponseEntity.status(401).build();
         }
-        
-        CustomUserPrincipal principal = (CustomUserPrincipal) authentication.getPrincipal();
-        User user = principal.getUser();
+
         UserDTO userDTO = UserDTO.fromUser(user);
         logger.info("Returning user info for: {}", userDTO.getEmail());
         return ResponseEntity.ok(userDTO);
@@ -99,11 +99,12 @@ public class AuthController {
     @GetMapping("/status")
     @Operation(summary = "Check authentication status")
     public ResponseEntity<Map<String, Object>> getAuthStatus(Authentication authentication) {
-        boolean authenticated = authentication != null && authentication.isAuthenticated();
+        User user = resolveUser(authentication);
+        boolean authenticated = user != null;
         Map<String, Object> status = Map.of(
                 "authenticated", authenticated,
-                "user", authenticated && authentication.getPrincipal() instanceof CustomUserPrincipal
-                        ? UserDTO.fromUser(((CustomUserPrincipal) authentication.getPrincipal()).getUser())
+                "user", authenticated
+                        ? UserDTO.fromUser(user)
                         : Map.of()
         );
         return ResponseEntity.ok(status);
@@ -123,6 +124,24 @@ public class AuthController {
                 .expiresIn(jwtService.getExpirationMs() / 1000)
                 .user(UserDTO.fromUser(user))
                 .build();
+    }
+
+    private User resolveUser(Authentication authentication) {
+        if (authentication == null || authentication.getPrincipal() == null) {
+            return null;
+        }
+
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof CustomUserPrincipal customUserPrincipal) {
+            return customUserPrincipal.getUser();
+        }
+        if (principal instanceof OAuth2User oAuth2User) {
+            String email = oAuth2User.getAttribute("email");
+            if (email != null && !email.isBlank()) {
+                return userService.findByEmail(email).orElse(null);
+            }
+        }
+        return null;
     }
 }
 
