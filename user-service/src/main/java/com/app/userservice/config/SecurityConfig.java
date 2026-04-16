@@ -48,12 +48,12 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/index.html", "/static/**", "/favicon.ico", "/error").permitAll()
-                        .requestMatchers("/auth", "/auth/login", "/auth/register", "/auth/logout").permitAll()
+                        .requestMatchers("/auth", "/auth/login", "/auth/register", "/auth/logout", "/auth/status").permitAll()
                         .requestMatchers("/oauth2/**", "/login/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/auth/user", "/auth/status").authenticated()
+                        .requestMatchers("/auth/user").authenticated()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2

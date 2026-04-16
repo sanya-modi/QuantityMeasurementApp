@@ -1,4 +1,12 @@
 16.16.113.27.nip.io {
     encode gzip zstd
-    reverse_proxy frontend:80
+
+    @backend path /api/* /auth/* /oauth2/* /login/* /actuator/* /v3/api-docs* /swagger-ui/*
+    handle @backend {
+        reverse_proxy api-gateway:8080
+    }
+
+    handle {
+        reverse_proxy frontend:80
+    }
 }

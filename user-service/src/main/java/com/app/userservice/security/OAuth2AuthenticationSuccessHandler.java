@@ -67,7 +67,8 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
             String targetUrl = UriComponentsBuilder
                     .fromUriString(resolveRedirectUri())
                     .queryParam("token", token)
-                    .build(true)
+                    .build()
+                    .encode()
                     .toUriString();
 
             response.sendRedirect(targetUrl);
@@ -81,7 +82,8 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         String targetUrl = UriComponentsBuilder
                 .fromUriString(resolveRedirectUri())
                 .queryParam("error", message)
-                .build(true)
+            .build()
+            .encode()
                 .toUriString();
         response.sendRedirect(targetUrl);
     }

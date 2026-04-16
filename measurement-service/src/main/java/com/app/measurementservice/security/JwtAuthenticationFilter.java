@@ -94,14 +94,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getServletPath();
-
-        return path.startsWith("/api/v1/quantities/compare") ||
-                path.startsWith("/api/v1/quantities/convert") ||
-                path.startsWith("/api/v1/quantities/add") ||
-                path.startsWith("/api/v1/quantities/subtract") ||
-                path.startsWith("/api/v1/quantities/multiply") ||
-                path.startsWith("/api/v1/quantities/divide");
+        return false;
     }
 }
 
