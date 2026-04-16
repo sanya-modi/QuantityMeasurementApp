@@ -1,0 +1,25 @@
+services:
+  caddy:
+    image: caddy:2.8-alpine
+    container_name: quantity-caddy
+    depends_on:
+      frontend:
+        condition: service_healthy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+    networks:
+      quantity-network:
+        aliases:
+          - edge-proxy
+
+volumes:
+  caddy_data:
+    name: quantity-caddy-data
+  caddy_config:
+    name: quantity-caddy-config

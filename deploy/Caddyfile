@@ -1,0 +1,4 @@
+16.16.113.27.nip.io {
+    encode gzip zstd
+    reverse_proxy frontend:80
+}
